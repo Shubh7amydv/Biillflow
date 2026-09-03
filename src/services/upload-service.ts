@@ -1,7 +1,5 @@
 import { SettingsRepository } from '@/repository/settings-repository';
 import logger from '@/utils/logger';
-import fs from 'fs/promises';
-import path from 'path';
 
 export class UploadService {
   private settingsRepository: SettingsRepository;
@@ -26,17 +24,9 @@ export class UploadService {
         throw err;
       }
 
-      // Ensure upload directory exists
-      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
-      await fs.mkdir(uploadDir, { recursive: true });
-
-      const extension = path.extname(fileName) || '.png';
-      const safeFileName = `logo-${userId}-${Date.now()}${extension}`;
-      const filePath = path.join(uploadDir, safeFileName);
-
-      await fs.writeFile(filePath, fileBuffer);
-
-      const logoUrl = `/uploads/${safeFileName}`;
+      // Encode as Base64 Data URL (100% serverless and Vercel compatible)
+      const base64Data = fileBuffer.toString('base64');
+      const logoUrl = `data:${mimeType};base64,${base64Data}`;
 
       // Update user's logo in Postgres
       await this.settingsRepository.updateSettings(userId, { logoUrl });
