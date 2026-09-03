@@ -28,6 +28,12 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
+  const handleSignOut = async () => {
+    setUserDropdownOpen(false);
+    await signOut({ redirect: false });
+    window.location.href = '/';
+  };
+
   const navLinks = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Invoices', href: '/invoices', icon: FileText },
@@ -61,13 +67,13 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
                     <Link
                       key={link.name}
                       href={link.href}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all ${
+                      className={`flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold transition-all ${
                         isActive
                           ? 'bg-[#E85A4F]/15 text-[#E85A4F] shadow-2xs'
-                          : 'text-[#6B6864] hover:text-[#2B2824] hover:bg-[#D8C3A5]/25'
+                          : 'text-[#6B6864] hover:bg-[#D8C3A5]/20 hover:text-[#2B2824]'
                       }`}
                     >
-                      <Icon className="w-3.5 h-3.5" />
+                      <Icon className="w-4 h-4" />
                       <span>{link.name}</span>
                     </Link>
                   );
@@ -75,29 +81,32 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
               </nav>
             </div>
 
-            {/* Right: + New Invoice & Profile Dropdown */}
-            <div className="flex items-center gap-3">
-              <Link
-                href="/invoices/new"
-                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-white bg-[#E85A4F] hover:bg-[#D44A3F] active:bg-[#C03D32] shadow-sm hover:shadow-md transition-all cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>New Invoice</span>
+            {/* Right: + New Invoice CTA & User Profile Dropdown */}
+            <div className="flex items-center gap-3 sm:gap-4">
+              <Link href="/invoices/new" className="hidden sm:inline-flex">
+                <button
+                  id="appshell-new-invoice-btn"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold text-white bg-[#E85A4F] hover:bg-[#D44A3F] active:bg-[#C03D32] shadow-xs hover:shadow-md transition-all cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>New Invoice</span>
+                </button>
               </Link>
 
               {/* User Dropdown */}
               <div className="relative">
                 <button
+                  id="appshell-user-menu-btn"
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-2.5 p-1.5 pl-3 rounded-full border border-[#D8C3A5] hover:border-[#8E8D8A] bg-[#EAE7DC]/60 hover:bg-[#FAF8F5] transition-all cursor-pointer text-left"
+                  className="flex items-center gap-2.5 p-1 sm:px-2.5 sm:py-1.5 rounded-full border border-[#D8C3A5] bg-[#FAF8F5] hover:bg-[#EAE7DC] text-[#2B2824] transition-colors cursor-pointer"
                 >
-                  <div className="hidden sm:block">
-                    <p className="text-xs font-bold text-[#2B2824] leading-tight max-w-[120px] truncate">
-                      {businessName}
-                    </p>
+                  <div className="w-7 h-7 rounded-full bg-[#E85A4F] text-white font-black text-xs flex items-center justify-center shadow-xs">
+                    {businessName.charAt(0).toUpperCase()}
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-[#E85A4F] text-white font-bold text-xs flex items-center justify-center shadow-2xs uppercase">
-                    {businessName.charAt(0) || 'B'}
+                  <div className="hidden sm:block text-left text-xs">
+                    <div className="font-bold text-[#2B2824] leading-tight truncate max-w-[120px]">
+                      {businessName}
+                    </div>
                   </div>
                 </button>
 
@@ -108,14 +117,10 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
                       className="fixed inset-0 z-40"
                       onClick={() => setUserDropdownOpen(false)}
                     />
-                    <div className="absolute right-0 mt-2 w-56 bg-[#FAF8F5] rounded-2xl border border-[#D8C3A5] shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                      <div className="px-4 py-2.5 border-b border-[#D8C3A5]/50">
-                        <p className="text-xs font-bold text-[#2B2824] truncate">
-                          {businessName}
-                        </p>
-                        <p className="text-[11px] text-[#8E8D8A] truncate mt-0.5">
-                          {userEmail}
-                        </p>
+                    <div className="absolute right-0 mt-2 w-56 bg-[#FAF8F5] rounded-2xl shadow-xl border border-[#D8C3A5] py-2 z-50 text-xs">
+                      <div className="px-4 py-2 border-b border-[#D8C3A5]/50">
+                        <div className="font-bold text-[#2B2824] truncate">{businessName}</div>
+                        <div className="text-[11px] text-[#8E8D8A] truncate">{userEmail}</div>
                       </div>
 
                       <div className="py-1">
@@ -142,7 +147,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
                       <div className="pt-1 border-t border-[#D8C3A5]/50">
                         <button
-                          onClick={() => signOut({ callbackUrl: '/' })}
+                          onClick={handleSignOut}
                           className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-[#E85A4F] hover:bg-[#E98074]/15 transition-colors cursor-pointer text-left"
                         >
                           <LogOut className="w-4 h-4" />
