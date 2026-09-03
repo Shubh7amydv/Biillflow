@@ -124,7 +124,6 @@ export default function SettingsPage() {
       }
 
       setLogoUrl(data.data.logoUrl);
-      await updateSession({ logoUrl: data.data.logoUrl });
       showToast('Studio logo uploaded!');
     } catch (err: any) {
       setError(err?.message || 'Failed to upload logo');
@@ -144,7 +143,6 @@ export default function SettingsPage() {
       const data = await res.json();
       if (data.success) {
         setLogoUrl(null);
-        await updateSession({ logoUrl: null });
         showToast('Logo removed');
       }
     } catch (err) {

@@ -42,7 +42,6 @@ export const authOptions: NextAuthOptions = {
             name: user.name,
             businessName: user.businessName,
             currency: user.currency,
-            logoUrl: user.logoUrl,
           } as any;
         } catch (error) {
           console.error('[NextAuth:authorize] Error validating credentials:', error);
@@ -57,13 +56,11 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.businessName = (user as any).businessName;
         token.currency = (user as any).currency;
-        token.logoUrl = (user as any).logoUrl;
       }
       if (trigger === 'update' && session) {
         if (session.name) token.name = session.name;
         if (session.businessName) token.businessName = session.businessName;
         if (session.currency) token.currency = session.currency;
-        if (session.logoUrl !== undefined) token.logoUrl = session.logoUrl;
       }
       return token;
     },
@@ -72,7 +69,6 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).id = token.id as string;
         (session.user as any).businessName = token.businessName as string;
         (session.user as any).currency = token.currency as string;
-        (session.user as any).logoUrl = token.logoUrl as string;
       }
       return session;
     },
