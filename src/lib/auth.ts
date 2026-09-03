@@ -4,7 +4,7 @@ import { AuthService } from '@/services/auth-service';
 import serverConfig from '@/config/server-config';
 
 export const authOptions: NextAuthOptions = {
-  secret: serverConfig.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || serverConfig.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -22,27 +22,32 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error('Email and password are required');
+          return null;
         }
 
-        const authService = new AuthService();
-        const user = await authService.validateCredentials(
-          credentials.email,
-          credentials.password
-        );
+        try {
+          const authService = new AuthService();
+          const user = await authService.validateCredentials(
+            credentials.email,
+            credentials.password
+          );
 
-        if (!user) {
-          throw new Error('Invalid email or password');
+          if (!user) {
+            return null;
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            businessName: user.businessName,
+            currency: user.currency,
+            logoUrl: user.logoUrl,
+          } as any;
+        } catch (error) {
+          console.error('[NextAuth:authorize] Error validating credentials:', error);
+          return null;
         }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          businessName: user.businessName,
-          currency: user.currency,
-          logoUrl: user.logoUrl,
-        } as any;
       },
     }),
   ],
